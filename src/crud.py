@@ -208,17 +208,3 @@ async def read_balance(customer_id: int, db: Session):
 	customer = await get_customer(customer_id=customer_id, db=db)
 	return customer.balance
 
-#import database
-
-#session = database.Session()
-
-#cust = session.query(bank_model.Customer).filter_by(id=5).first()
-#cust = get_customer_by_email(email='alb@mail.ru', db=session)
-#print(cust)
-#prod1 = session.query(bank_model.Product).filter_by(id=1).first()
-#prod2 = session.query(bank_model.Product).filter_by(id=2).first()
-#customer.products.append(prod1)
-#customer.products.append(prod2)
-#session.commit()
-
-

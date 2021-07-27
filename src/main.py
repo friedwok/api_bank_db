@@ -52,18 +52,6 @@ def user_authorized(db: Session = Depends(get_db), current_user: str = Depends(o
 	return db
 
 
-#async def user_is_admin(current_user: str = Depends(oauth2_scheme)):
-	#token is an email
-#	db = get_db()
-#	user = await crud.get_user_by_email(db=db, user_email=current_user)
-#	if user.is_customer:
-#		raise HTTPException(status_code=403,
-#				detail="Sorry, you don't have access rights to this content"
-#				)
-#	return db
-
-
-
 # account, customer, product, branch: create, read, update, delete
 # Separately we can create branch and product, for creating an account we need to have a customer.
 # If we create a customer, we must already have a branch and products,
@@ -91,10 +79,6 @@ async def read_accounts(db: Session = Depends(get_db)):
 @app.post("/accounts/{account_id}", response_model=schemas.Account)
 async def update_account(account: schemas.AccountUpdate, db: Session = Depends(user_is_admin)):
 	acc = await crud.get_account(db=db, account_id=account.id)
-	#if not acc:
-	#	raise HTTPException(status_code=404,
-	#			detail="Account with id %d not found" % account.id
-	#			)
 	http_not_found(acc, 'Account', account.id)
 
 	updated_account = await crud.update_account(db=db, account=account)
@@ -103,8 +87,6 @@ async def update_account(account: schemas.AccountUpdate, db: Session = Depends(u
 @app.get("/accounts/delete/{account_id}", response_model=schemas.Account)
 async def delete_account(account_id: int, db: Session = Depends(user_is_admin)):
 	acc = await crud.get_account(db=db, account_id=account_id)
-	#if acc is None:
-	#	raise HTTPException(status_code=404, detail="Account with id %d not found" % account_id)
 	http_not_found(acc, 'Account', account_id)
 	acc = await crud.delete_account(db=db, account_id=account_id)
 	return acc
@@ -142,10 +124,6 @@ async def read_customers(db: Session = Depends(get_db)):
 @app.post("/customers/{customer_id}", response_model=schemas.Customer)
 async def update_customer(customer: schemas.CustomerUpdate, db: Session = Depends(user_is_admin)):
 	cust = await crud.get_customer(db=db, customer_id=customer.id)
-	#if cust is None:
-	#	raise HTTPException(status_code=404,
-	#			detail="Customer with id %d not found" % customer_id
-	#			)
 	http_not_found(cust, 'Customer', customer.id)
 
 	return await crud.update_customer(db=db, customer=customer)
@@ -153,10 +131,6 @@ async def update_customer(customer: schemas.CustomerUpdate, db: Session = Depend
 @app.post("/customer/{customer_id}/delete", response_model=schemas.Customer)
 async def delete_customer(customer_id: int, db: Session = Depends(user_is_admin)):
 	customer = await crud.get_customer(customer_id=customer_id, db=db)
-	#if customer is None:
-	#	raise HTTPException(status_code=404,
-	#			detail="Customer with id %d not found" % customer_id
-	#			)
 	http_not_found(customer, 'Customer', customer_id)
 
 	return await crud.delete_customer(customer_id=customer_id, db=db)
@@ -197,8 +171,6 @@ async def create_branch(branch: schemas.BranchCreate, db: Session = Depends(user
 @app.get("/branch/{branch_id}", response_model=schemas.Branch)
 async def read_branch(branch_id: int, db: Session = Depends(user_authorized)):
 	branch = await crud.get_branch(branch_id=branch_id, db=db)
-	#if branch is None:
-	#	raise HTTPException(status_code=404, detail="Branch with id %s not found" % branch_id)
 	http_not_found(branch, 'Branch', branch_id)
 	return branch
 
@@ -209,23 +181,12 @@ async def read_branches(db: Session = Depends(user_authorized)):
 @app.post("/branches/{branch_id}", response_model=schemas.Branch)
 async def update_branch(branch: schemas.BranchUpdate, db: Session = Depends(user_is_admin)):
 	br = await crud.get_branch(db=db, branch_id=branch.id)
-	#if br is None:
-	#	raise HTTPException(status_code=404, detail="Branch with id %d not found" % branch.id)
 	http_not_found(br, 'Branch', branch.id)
-
-	#for customer_id in branch.customer_ids:
-	#	cust = await crud.get_customer_by_id(db=db, customer_id=customer_id)
-	#	if cust is None:
-	#		raise HTTPException(status_code=404,
-	#				detail="Customer with id %s not found" % customer_id)
-
 	return await crud.update_branch(db=db, branch=branch)
 
 @app.get("/branches/delete/{branch_id}", response_model=schemas.Branch)
 async def delete_branch(branch_id: int, db: Session = Depends(user_is_admin)):
 	branch = await crud.get_branch(branch_id=branch_id, db=db)
-	#if branch is None:
-	#	raise HTTPException(status_code=404, detail="Branch with id %s not found" % branch_id)
 	http_not_found(branch, 'Branch', branch_id)
 
 	customers = db.query(bank_model.Customer).filter_by(branch_id=branch_id).all()
@@ -247,9 +208,6 @@ async def create_product(product: schemas.ProductCreate, db: Session = Depends(u
 
 	for customer_id in product.customer_ids:
 		cust = await crud.get_customer_by_id(db=db, customer_id=customer_id)
-		#if not cust:
-		#	raise HTTPException(status_code=404,
-		#			detail="Customer with id %d not found" % customer_id)
 		http_not_found(cust, 'Customer', customer_id)
 
 	return await crud.create_product(db=db, product=product)
@@ -270,22 +228,12 @@ async def read_products(db: Session = Depends(user_authorized)):
 async def update_product(product: schemas.ProductUpdate, db: Session = Depends(user_is_admin)):
 	prod = await crud.get_product(product_id=product.id, db=db)
 	http_not_found(prod, 'Product', product.id)
-
-	#for customer_id in product.customer_ids:
-	#	cust = await crud.get_customer_by_id(db=db, customer_id=customer_id)
-	#	if cust is None:
-	#		raise HTTPException(status_code=404,
-	#				detail="Customer with id %s not found" % customer_id)
-
 	return await crud.update_product(db=db, product=product)
 
 
 @app.post("/products/delete/{product_id}", response_model=schemas.Product)
 async def delete_product(product_id: int, db: Session = Depends(user_is_admin)):
 	product = await crud.get_product(product_id=product_id, db=db)
-	#if product is None:
-	#	raise HTTPException(status_code=404,
-	#			detail="Product with product_id %d not found" % product_id)
 	http_not_found(product, 'Product', product_id)
 
 	return await crud.delete_product(product_id=product_id, db=db)

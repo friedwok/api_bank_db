@@ -23,8 +23,6 @@ class AccountCreate(AccountBase):
 class AccountUpdate(BaseModel):
 	id: int
 	money: Optional[str] = None
-	#customer_id: Optional[int] = None
-
 
 class Account(AccountBase):
 	id: int
@@ -109,7 +107,6 @@ class BranchUpdate(BaseModel):
 
 class Branch(BranchBase):
 	id: int
-	#customers: List[Customer]
 
 	class Config:
 		orm_mode=True
