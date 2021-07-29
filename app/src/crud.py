@@ -1,17 +1,25 @@
 from sqlalchemy.orm import Session
 import src.bank_model as bank_model
 import src.schemas as schemas
-from sqlalchemy import func, select
-
+from fastapi.concurrency import run_in_threadpool
 
 async def get_user_by_email(db: Session, user_email: str):
-	return db.query(bank_model.User).filter(bank_model.User.email==user_email).first()
-
-async def get_customer_by_id(db: Session, customer_id: int):
-	return db.query(bank_model.Customer).get(customer_id)
+	data = await run_in_threadpool(
+		db
+			.query(bank_model.User)
+			.filter(bank_model.User.email==user_email)
+			.first,
+	)
+	return data
 
 async def get_customer_by_email(db: Session, email: str):
-	return db.query(bank_model.Customer).filter_by(email=email).first()
+	data = await run_in_threadpool(
+	db
+		.query(bank_model.Customer)
+		.filter_by(email=email)
+		.first,
+	)
+	return data
 
 #account
 async def create_account(db: Session, account: schemas.AccountCreate):
@@ -21,10 +29,21 @@ async def create_account(db: Session, account: schemas.AccountCreate):
 	return acc
 
 async def get_account(account_id: int, db: Session):
-	return db.query(bank_model.Account).get(account_id)
+	data = await run_in_threadpool(
+		db
+			.query(bank_model.Account)
+			.get,
+			account_id
+	)
+	return data
 
 async def get_accounts(db: Session):
-	return db.query(bank_model.Account).all()
+	data = await run_in_threadpool(
+		db
+			.query(bank_model.Account)
+			.all,
+	)
+	return data
 
 async def update_account(db: Session, account: schemas.AccountUpdate):
 	Acc = bank_model.Account
@@ -55,10 +74,21 @@ async def create_branch(db: Session, branch: schemas.BranchCreate):
 	return br
 
 async def get_branch(branch_id: int, db: Session):
-	return db.query(bank_model.Branch).get(branch_id)
+	data = await run_in_threadpool(
+		db
+			.query(bank_model.Branch)
+			.get,
+			branch_id
+	)
+	return data
 
 async def get_branches(db: Session):
-	return db.query(bank_model.Branch).all()
+	data = await run_in_threadpool(
+		db
+			.query(bank_model.Branch)
+			.all
+	)
+	return data
 
 async def update_branch(db: Session, branch: schemas.BranchUpdate):
 	br = bank_model.Branch
@@ -99,13 +129,30 @@ async def create_product(db: Session, product: schemas.ProductCreate):
 	return prod
 
 async def get_product(product_id: int, db: Session):
-	return db.query(bank_model.Product).get(product_id)
+	data = await run_in_threadpool(
+		db
+			.query(bank_model.Product)
+			.get,
+			product_id
+	)
+	return data
 
 async def get_product_by_name(product_name: str, db: Session):
-	return db.query(bank_model.Product).filter_by(product_name=product_name).first()
+	data = await run_in_threadpool(
+		db
+			.query(bank_model.Product)
+			.filter_by(product_name=product_name)
+			.first
+	)
+	return data
 
 async def get_products(db: Session):
-	return db.query(bank_model.Product).all()
+	data = await run_in_threadpool(
+		db
+			.query(bank_model.Product)
+			.all
+	)
+	return data
 
 async def update_product(db: Session, product: schemas.ProductUpdate):
 	pr = bank_model.Product
@@ -139,11 +186,17 @@ async def create_customer(db: Session, customer: schemas.CustomerCreate):
 	return cust
 
 async def get_customer(customer_id: int, db: Session):
-	data = db.query(bank_model.Customer).get(customer_id)
+	data = await run_in_threadpool(
+		db.query(bank_model.Customer).get,
+		customer_id
+	)
 	return data
 
 async def get_customers(db: Session):
-	return db.query(bank_model.Customer).all()
+	data = await run_in_threadpool(
+		db.query(bank_model.Customer).all
+	)
+	return data
 
 #fullname, city, address, email, branch_id
 async def update_customer(db: Session, customer: schemas.CustomerUpdate):
@@ -204,7 +257,7 @@ async def delete_products(customer_id: int, products: schemas.AddProduct, db: Se
 
 	return prods
 
-async def read_balance(customer_id: int, db: Session):
+async def get_balance(customer_id: int, db: Session):
 	customer = await get_customer(customer_id=customer_id, db=db)
 	return customer.balance
 

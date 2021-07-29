@@ -61,7 +61,7 @@ def user_authorized(db: Session = Depends(get_db), current_user: str = Depends(o
 #account
 @app.post("/accounts/", response_model=schemas.Account)
 async def create_account(account: schemas.AccountCreate, db: Session = Depends(user_is_admin)):
-	customer = await crud.get_customer_by_id(db, customer_id=account.customer_id)
+	customer = await crud.get_customer(db=db, customer_id=account.customer_id)
 	http_not_found(customer, 'Customer', account.customer_id)
 	return await crud.create_account(db=db, account=account)
 
@@ -157,7 +157,7 @@ async def delete_products(customer_id: int, products: schemas.AddProduct, db: Se
 
 @app.get("/customer/{customer_id}/balance/")
 async def read_balance(customer_id: int, db: Session = Depends(user_is_customer)):
-	return await crud.read_balance(customer_id=customer_id, db=db)
+	return await crud.get_balance(customer_id=customer_id, db=db)
 
 
 
@@ -207,7 +207,7 @@ async def create_product(product: schemas.ProductCreate, db: Session = Depends(u
 				detail="Product %d already exists" % product.id)
 
 	for customer_id in product.customer_ids:
-		cust = await crud.get_customer_by_id(db=db, customer_id=customer_id)
+		cust = await crud.get_customer(db=db, customer_id=customer_id)
 		http_not_found(cust, 'Customer', customer_id)
 
 	return await crud.create_product(db=db, product=product)
