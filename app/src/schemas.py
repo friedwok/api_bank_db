@@ -64,7 +64,6 @@ class CustomerBase(BaseModel):
 class CustomerCreate(CustomerBase):
 	#account_ids: List[Account]
 	branch_id: int
-	#products: List[str] = []
 
 
 class CustomerUpdate(BaseModel):
@@ -82,6 +81,7 @@ class AddProduct(BaseModel):
 class Customer(CustomerBase):
 	id: int
 	branch_id: int
+	balance: str
 	#info: str
 
 	class Config:
@@ -107,6 +107,7 @@ class BranchUpdate(BaseModel):
 
 class Branch(BranchBase):
 	id: int
+	customers_: str
 
 	class Config:
 		orm_mode=True

@@ -66,8 +66,9 @@ class Customer(Base):
 		i = 1
 		for acc in self.account_ids[:-1]:
 			full += 'Account {}: {}, '.format(i, acc.money)
+			#print(self.account_ids)
 			i += 1
-		full += 'Account {}: {}'.format(i, acc.money)
+		full += 'Account {}: {}'.format(i, self.account_ids[-1].money)
 		return full
 
 	#@balance.expression
@@ -101,6 +102,17 @@ class Branch(Base):
 	address = Column(String(50))
 
 	customers = relationship('Customer')
+
+	@hybrid_property
+	def customers_(self):
+		cust_list = ""
+		i = 1
+		for cust in self.customers[:-1]:
+			cust_list += 'Full name: {}, id: {}, '.format(cust.fullname, cust.id)
+		cust_list += 'Full name: {}, id: {}'\
+			.format(self.customers[-1].fullname, self.customers[-1].id)
+		return cust_list
+
 
 	@hybrid_property
 	def full_address(self):

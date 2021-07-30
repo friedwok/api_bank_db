@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 import src.bank_model as bank_model
 import src.schemas as schemas
 from fastapi.concurrency import run_in_threadpool
@@ -49,9 +50,8 @@ async def update_account(db: Session, account: schemas.AccountUpdate):
 	Acc = bank_model.Account
 	update_dict = {}
 
-	#if account.customer_id:
-	#	update_dict.update({Acc.customer_id: account.customer_id})
 	if account.money:
+		#await run_in_threadpool(update_dict.update, {Acc.money: account.money})
 		update_dict.update({Acc.money: account.money})
 
 	if update_dict:
@@ -189,7 +189,13 @@ async def get_customer(customer_id: int, db: Session):
 	data = await run_in_threadpool(
 		db.query(bank_model.Customer).get,
 		customer_id
+		#db
+		#.query(bank_model.Customer)
+		#.join(bank_model.Account, bank_model.Customer.id == bank_model.Account.customer_id)
+		#.filter(bank_model.Customer.id == customer_id)
+		#.group_by(bank_model.Customer.id).first,
 	)
+	#print(data)
 	return data
 
 async def get_customers(db: Session):

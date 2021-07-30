@@ -111,9 +111,7 @@ async def create_customer(customer: schemas.CustomerCreate, db: Session = Depend
 @app.get("/customer/{customer_id}/", response_model=schemas.Customer)
 async def read_customer(customer_id: int, db: Session = Depends(user_is_customer)):
 	customer = await crud.get_customer(customer_id=customer_id, db=db)
-
 	http_not_found(customer, 'Customer', customer_id)
-
 	return customer
 
 #this method - exception, according to the rule, admin and customer can't watch clients
