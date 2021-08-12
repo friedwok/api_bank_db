@@ -9,7 +9,6 @@ from src.database import Session
 import src.bank_model as bank_model
 import src.schemas as schemas
 import src.crud as crud
-#import json
 
 
 app = FastAPI()

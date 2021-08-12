@@ -61,12 +61,10 @@ class Customer(Base):
 
 	@hybrid_property
 	def balance(self):
-		#return sum(account.money for account in self.account_ids)
 		full = ""
 		i = 1
 		for acc in self.account_ids[:-1]:
 			full += 'Account {}: {}, '.format(i, acc.money)
-			#print(self.account_ids)
 			i += 1
 		full += 'Account {}: {}'.format(i, self.account_ids[-1].money)
 		return full
